@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-background: var(--color-background);
+  --color-card: var(--color-card);
+  --color-text: var(--color-text);
+  --color-text-muted: var(--color-text-muted);
+  --color-border: var(--color-border);
+  
+  --radius-none: var(--radius-global, 0px);
+  --radius-sm: var(--radius-global, 0.125rem);
+  --radius-md: var(--radius-global, 0.375rem);
+  --radius-lg: var(--radius-global, 0.5rem);
+  --radius-xl: var(--radius-global, 0.75rem);
+  --radius-2xl: var(--radius-global, 1rem);
+  --radius-3xl: var(--radius-global, 1.5rem);
+}
+
+:root {
+  --color-primary: #3b82f6; /* Blue-500 */
+  --color-primary-hover: #2563eb; /* Blue-600 */
+  --color-background: #f8fafc; /* Slate-50 */
+  --color-card: #ffffff; /* White */
+  --color-text: #0f172a; /* Slate-900 */
+  --color-text-muted: #64748b; /* Slate-500 */
+  --color-border: #e2e8f0; /* Slate-200 */
+  --radius-global: 1rem;
+}
+
+[data-theme="dark"] {
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-background: #0f172a; /* Slate-900 */
+  --color-card: #1e293b; /* Slate-800 */
+  --color-text: #f8fafc; /* Slate-50 */
+  --color-text-muted: #94a3b8; /* Slate-400 */
+  --color-border: #334155; /* Slate-700 */
+}
+
+body {
+  font-family: "Outfit", system-ui, -apple-system, sans-serif;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: var(--color-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Hide scrollbar utility */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-background); 
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border); 
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted); 
+}
