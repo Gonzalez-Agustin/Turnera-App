@@ -200,8 +200,8 @@ export const AdminDashboard = () => {
                       </motion.tr>
                     )}
                     {clientes.sort((a, b) => {
-                        const aTime = isValid(a.lastTurno) ? a.lastTurno.getTime() : 0;
-                        const bTime = isValid(b.lastTurno) ? b.lastTurno.getTime() : 0;
+                        const aTime = isValid(a.lastTurno) ? new Date(a.lastTurno).getTime() : 0;
+                        const bTime = isValid(b.lastTurno) ? new Date(b.lastTurno).getTime() : 0;
                         return bTime - aTime;
                     }).map(client => (
                       <motion.tr 
@@ -655,7 +655,7 @@ export const AdminDashboard = () => {
                       </td>
                     </motion.tr>
                   )}
-                  {turnos.sort((a, b) => a.datetime.getTime() - b.datetime.getTime()).map(turno => {
+                  {turnos.sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime()).map(turno => {
                     const service = servicios.find(s => s.id === turno.serviceId);
                     return (
                       <motion.tr 

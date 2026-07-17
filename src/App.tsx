@@ -3,7 +3,7 @@ import { ClientBooking } from './pages/ClientBooking';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { LandingPage } from './pages/LandingPage';
 import { Login } from './pages/Login';
-import { useEffect } from 'react';
+
 import type { ReactNode } from 'react';
 import { TurnosProvider, useTurnosContext } from './context/TurnosContext';
 

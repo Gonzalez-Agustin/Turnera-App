@@ -186,7 +186,7 @@ export const ClientBooking = () => {
   const getDayNames = () => {
     if (!tenantInfo || tenantInfo.workingDays.length === 0) return 'Cerrado temporalmente';
     if (tenantInfo.workingDays.length === 7) return 'Lunes a Domingo';
-    const firstDay = daysOfWeek[tenantInfo.workingDays[0] === 0 ? 6 : tenantInfo.workingDays[0] - 1]; // workingDays 0=Sun, daysOfWeek 0=Mon. Wait, daysOfWeek is Lun to Dom. JS getDay is 0=Sun, 1=Mon.
+
     // Better approximation:
     return `Días hábiles`;
   };

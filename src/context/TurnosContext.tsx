@@ -129,7 +129,7 @@ export const TurnosProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [isAuthenticated]);
 
-  const agregarTurno = async (turno: Omit<Turno, 'id' | 'status'>) => {
+  const agregarTurno = async (_turno: Omit<Turno, 'id' | 'status'>) => {
     // Handled mostly by public endpoint via Landing Page
     return "implemented-in-client-booking"; 
   };
@@ -156,7 +156,7 @@ export const TurnosProvider = ({ children }: { children: ReactNode }) => {
       headers: fetchHeaders()
     });
     setClientes(prev => prev.filter(c => c.id !== id));
-    setTurnos(prev => prev.filter(t => t.clientId !== id)); // Also remove their appointments from local state
+    refreshData(); // Fetch fresh data to ensure turnos are updated properly
   };
 
   const agregarServicio = async (servicio: Omit<Service, 'id'>) => {
