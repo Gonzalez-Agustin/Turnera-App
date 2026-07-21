@@ -521,9 +521,7 @@ export const LandingPage = () => {
             <span className="text-xl font-bold tracking-tight italic pr-2 text-transparent bg-clip-text bg-gradient-to-r from-primary to-violet-500">
               TurneraApp
             </span>
-            <span className="text-text-muted text-sm flex items-center justify-center gap-2">
-              <MessageCircle size={14} /> +54 9 11 1234-5678
-            </span>
+
           </div>
           <p className="text-sm text-text-muted text-center">
             © {new Date().getFullYear()} TurneraApp. Todos los derechos reservados.
