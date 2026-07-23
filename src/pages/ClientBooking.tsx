@@ -19,6 +19,7 @@ export const ClientBooking = () => {
   const [tenantInfo, setTenantInfo] = useState<any>(null);
   const [servicios, setServicios] = useState<Service[]>([]);
   const [occupiedTimes, setOccupiedTimes] = useState<string[]>([]);
+  const [isBooking, setIsBooking] = useState(false);
   
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [formData, setFormData] = useState({ name: '', lastName: '', email: '' });
@@ -142,6 +143,7 @@ export const ClientBooking = () => {
 
   const handleBooking = async () => {
     if (selectedService && selectedDate && selectedTime && tenantInfo) {
+      setIsBooking(true);
       const [hour, minute] = selectedTime.split(':').map(Number);
       const exactDatetime = set(selectedDate, { hours: hour, minutes: minute });
       
@@ -172,6 +174,8 @@ export const ClientBooking = () => {
         setOccupiedTimes(prev => [...prev, newTurno.datetime]);
       } catch (e) {
         setAlertMessage('Error conectando al servidor.');
+      } finally {
+        setIsBooking(false);
       }
     }
   };
@@ -508,17 +512,21 @@ export const ClientBooking = () => {
 
           <div className="mt-10 flex justify-end">
             <button 
-              disabled={!selectedService || !selectedDate || !selectedTime}
+              disabled={!selectedService || !selectedDate || !selectedTime || isBooking}
               onClick={handleBooking}
               className={`
-                py-3 px-8 rounded-xl font-bold transition-all shadow-sm
-                ${selectedService && selectedDate && selectedTime 
+                py-3 px-8 rounded-xl font-bold transition-all shadow-sm flex items-center gap-2
+                ${(selectedService && selectedDate && selectedTime && !isBooking)
                   ? 'bg-primary text-white hover:bg-primary-hover hover:shadow-md hover:-translate-y-0.5' 
                   : 'bg-background text-text-muted cursor-not-allowed'}
               `}
-              style={(selectedService && selectedDate && selectedTime) ? { color: '#fff' } : {}}
+              style={(selectedService && selectedDate && selectedTime && !isBooking) ? { color: '#fff' } : {}}
             >
-              Confirmar Turno
+              {isBooking ? (
+                <><Loader2 size={18} className="animate-spin" /> Procesando...</>
+              ) : (
+                'Confirmar Turno'
+              )}
             </button>
           </div>
         </div>
