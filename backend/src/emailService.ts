@@ -13,6 +13,10 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendAppointmentEmail = async (clientEmail: string, clientName: string, serviceName: string, date: string, time: string, tenantName: string) => {
+  if (!process.env.EMAIL_USER || process.env.EMAIL_PASS === '12345') {
+    console.log('Skipping client email due to dummy or missing credentials');
+    return false;
+  }
   try {
     const mailOptions = {
       from: `"TurneraApp - ${tenantName}" <${process.env.EMAIL_USER}>`,
@@ -49,6 +53,10 @@ export const sendAppointmentEmail = async (clientEmail: string, clientName: stri
 };
 
 export const sendAdminNotificationEmail = async (adminEmail: string, clientName: string, serviceName: string, date: string, time: string) => {
+  if (!process.env.EMAIL_USER || process.env.EMAIL_PASS === '12345') {
+    console.log('Skipping admin email due to dummy or missing credentials');
+    return false;
+  }
   try {
     const mailOptions = {
       from: `"TurneraApp Alertas" <${process.env.EMAIL_USER}>`,
