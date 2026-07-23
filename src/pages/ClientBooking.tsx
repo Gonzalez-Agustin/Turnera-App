@@ -20,6 +20,7 @@ export const ClientBooking = () => {
   const [servicios, setServicios] = useState<Service[]>([]);
   const [occupiedTimes, setOccupiedTimes] = useState<string[]>([]);
   const [isBooking, setIsBooking] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
   
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [formData, setFormData] = useState({ name: '', lastName: '', email: '' });
@@ -59,6 +60,24 @@ export const ClientBooking = () => {
           const slotsData = await resSlots.json();
           // Store all occupied times for easy lookup later
           setOccupiedTimes(slotsData.map((s: any) => new Date(s.datetime).toISOString()));
+          
+          // Check for existing active session & appointment in localStorage
+          const savedClient = localStorage.getItem(`turnera_client_${data.id}`);
+          if (savedClient) {
+            const parsedClient = JSON.parse(savedClient);
+            setFormData(parsedClient);
+            setIsLoggedIn(true);
+          }
+
+          const savedAppt = localStorage.getItem(`turnera_appt_${data.id}`);
+          if (savedAppt) {
+            const appt = JSON.parse(savedAppt);
+            if (new Date(appt.datetime) > new Date()) {
+              setBookedTurnoId(appt.id);
+            } else {
+              localStorage.removeItem(`turnera_appt_${data.id}`);
+            }
+          }
         }
       } catch (err) {
         console.error(err);
@@ -195,13 +214,49 @@ export const ClientBooking = () => {
         const newTurno = await res.json();
         setBookedTurnoId(newTurno.id);
         
-        // Add to occupied times locally so it shows if user books again
+        // Save to localStorage
+        localStorage.setItem(`turnera_client_${tenantInfo.id}`, JSON.stringify(formData));
+        localStorage.setItem(`turnera_appt_${tenantInfo.id}`, JSON.stringify({
+          id: newTurno.id,
+          datetime: exactDatetime.toISOString()
+        }));
+
         setOccupiedTimes(prev => [...prev, newTurno.datetime]);
       } catch (e) {
         setAlertMessage('Error conectando al servidor.');
       } finally {
         setIsBooking(false);
       }
+    }
+  };
+
+  const handleCancelTurno = async () => {
+    if (!bookedTurnoId || !tenantInfo) return;
+    setIsCancelling(true);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/appointments/client-cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          appointmentId: bookedTurnoId,
+          clientEmail: formData.email
+        })
+      });
+      if (res.ok) {
+        localStorage.removeItem(`turnera_appt_${tenantInfo.id}`);
+        setBookedTurnoId(null);
+        setSelectedService(null);
+        setSelectedDate(null);
+        setSelectedTime(null);
+        setAlertMessage('Turno cancelado correctamente.');
+        setTimeout(() => setAlertMessage(null), 4000);
+      } else {
+        setAlertMessage('Error al cancelar el turno.');
+      }
+    } catch (e) {
+      setAlertMessage('Error de conexión.');
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -328,8 +383,8 @@ export const ClientBooking = () => {
             </h2>
             
             {!isCancelled && (
-              <p className="text-text-muted text-sm mb-6">
-                Te enviamos los detalles a {formData.email}
+              <p className="text-text-muted mb-8 text-lg">
+                Te enviamos un correo con los detalles. ¡Te esperamos!
               </p>
             )}
             
@@ -349,10 +404,11 @@ export const ClientBooking = () => {
             
             {!isCancelled && (
               <button 
-                onClick={handleCancelBooking}
-                className="w-full py-3 bg-red-500/10 text-red-500 font-semibold rounded-xl hover:bg-red-500/20 transition-colors"
+                onClick={handleCancelTurno}
+                disabled={isCancelling}
+                className="w-full bg-red-50 text-red-600 hover:bg-red-100 font-semibold py-3 px-6 rounded-xl transition-all shadow-sm flex justify-center items-center gap-2"
               >
-                Cancelar Turno
+                {isCancelling ? <Loader2 size={18} className="animate-spin" /> : 'Cancelar Turno'}
               </button>
             )}
 

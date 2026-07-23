@@ -94,6 +94,19 @@ app.post('/api/appointments', async (req, res) => {
       client = await prisma.client.create({
         data: { name: clientName, email: clientEmail, phone: clientPhone, tenantId }
       });
+    } else {
+      // Prevent multiple active appointments per client per tenant
+      const existingAppointment = await prisma.appointment.findFirst({
+        where: {
+          clientId: client.id,
+          tenantId,
+          datetime: { gte: new Date() },
+          status: { not: 'cancelado' }
+        }
+      });
+      if (existingAppointment) {
+        return res.status(400).json({ error: 'Ya tenés un turno reservado. No podés tener más de un turno activo a la vez.' });
+      }
     }
 
     // 2. Create Appointment
@@ -146,6 +159,36 @@ app.post('/api/appointments', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to create appointment' });
+  }
+});
+
+// --- PUBLIC CANCEL APPOINTMENT ---
+app.post('/api/appointments/client-cancel', async (req, res) => {
+  const { appointmentId, clientEmail } = req.body;
+  
+  try {
+    const appointment = await prisma.appointment.findUnique({
+      where: { id: appointmentId },
+      include: { client: true }
+    });
+
+    if (!appointment) {
+      return res.status(404).json({ error: 'Turno no encontrado.' });
+    }
+
+    if (appointment.client.email !== clientEmail) {
+      return res.status(403).json({ error: 'No tienes permiso para cancelar este turno.' });
+    }
+
+    await prisma.appointment.update({
+      where: { id: appointmentId },
+      data: { status: 'cancelado' }
+    });
+
+    res.json({ success: true, message: 'Turno cancelado exitosamente.' });
+  } catch (error) {
+    console.error('Error cancelling appointment:', error);
+    res.status(500).json({ error: 'Error al cancelar el turno.' });
   }
 });
 
