@@ -110,14 +110,39 @@ export const ClientBooking = () => {
         minute -= 60;
       }
     }
+    
+    // Filter past times if selected date is today
+    if (isSameDay(selectedDate, new Date())) {
+      const now = new Date();
+      const currentHour = now.getHours();
+      const currentMinute = now.getMinutes();
+      return slots.filter(time => {
+        const [slotHour, slotMinute] = time.split(':').map(Number);
+        if (slotHour > currentHour) return true;
+        if (slotHour === currentHour && slotMinute > currentMinute) return true;
+        return false;
+      });
+    }
+
     return slots;
   };
   const timeSlots = generateTimeSlots();
 
   // --- HANDLERS ---
+  const isValidEmail = (email: string) => {
+    // Strict Regex for standard email formats
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  };
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.name && formData.lastName && formData.email) {
+      if (!isValidEmail(formData.email)) {
+        setAlertMessage('Por favor, ingresá un correo electrónico válido (ej. nombre@gmail.com)');
+        setTimeout(() => setAlertMessage(null), 4000);
+        return;
+      }
       setIsLoggedIn(true);
     }
   };
@@ -272,6 +297,11 @@ export const ClientBooking = () => {
             >
               Comenzar a reservar
             </button>
+            {alertMessage && (
+              <div className="mt-4 p-3 bg-red-500/10 text-red-500 text-xs font-medium rounded-lg flex items-center justify-center gap-2">
+                <AlertCircle size={14} /> {alertMessage}
+              </div>
+            )}
           </form>
         </div>
       </div>

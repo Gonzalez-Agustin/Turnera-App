@@ -75,6 +75,18 @@ app.get('/api/tenants/:slug/appointments', async (req, res) => {
 app.post('/api/appointments', async (req, res) => {
   const { tenantId, serviceId, clientName, clientEmail, clientPhone, datetime } = req.body;
   
+  // Basic strict email validation on the backend
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(clientEmail)) {
+    return res.status(400).json({ error: 'Correo electrónico inválido.' });
+  }
+
+  // Prevent past dates
+  const appointmentDate = new Date(datetime);
+  if (appointmentDate < new Date()) {
+    return res.status(400).json({ error: 'No se pueden reservar turnos en el pasado.' });
+  }
+
   try {
     // 1. Create or find Client
     let client = await prisma.client.findUnique({ where: { email: clientEmail } });
